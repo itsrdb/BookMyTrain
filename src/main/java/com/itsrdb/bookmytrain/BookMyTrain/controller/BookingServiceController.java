@@ -73,7 +73,7 @@ public class BookingServiceController {
         try {
             List<TrainResponse> availableTrains = bookingService
                     .getAvailableTrainsForSourceDestination(stationToStationRequest);
-            return ResponseEntity.ok(newTrain);
+            return ResponseEntity.ok(availableTrains);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

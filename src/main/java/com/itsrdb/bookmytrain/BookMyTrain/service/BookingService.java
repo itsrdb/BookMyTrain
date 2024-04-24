@@ -29,10 +29,11 @@ public class BookingService {
 
         List<TrainResponse> availableTrains = new ArrayList<>();
         for (Train train: trains) {
-            // Need to find available seats per train
-            Long availableSeats = getTotalAvailableSeats(train, bookingDate);
+            long availableSeats = getTotalAvailableSeats(train, bookingDate);
+            if (availableSeats == 0)
+                continue;
 
-            Boolean sourceFound = false;
+            boolean sourceFound = false;
             for (Schedule schedule: train.getSchedules()) {
                 if (schedule.getStationName().equals(source)) {
                     sourceFound = true;
