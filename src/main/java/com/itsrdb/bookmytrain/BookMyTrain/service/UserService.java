@@ -3,6 +3,8 @@ package com.itsrdb.bookmytrain.BookMyTrain.service;
 import com.itsrdb.bookmytrain.BookMyTrain.dto.UserRequest;
 import com.itsrdb.bookmytrain.BookMyTrain.model.User;
 import com.itsrdb.bookmytrain.BookMyTrain.repository.UserRepository;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,17 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+
+    public UserService(
+            UserRepository userRepository,
+            AuthenticationManager authenticationManager,
+            BCryptPasswordEncoder passwordEncoder
+    ) {
+        this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public void register(UserRequest userRequest, User.Role role) throws Exception {
         User user = User.builder()
@@ -27,11 +40,14 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public User login(String username, String password) throws Exception {
-        Optional<User> userOptional = userRepository.findByUsername(username);
-        if (userOptional.isEmpty() || !passwordEncoder.matches(password, userOptional.get().getPassword())) {
-            throw new Exception("Invalid username or password");
-        }
-        return userOptional.get();
+    public User authenticate(UserRequest userRequest) throws Exception {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        userRequest.getUsername(),
+                        userRequest.getPassword()
+                )
+        );
+        return userRepository.findByUsername(userRequest.getUsername())
+                .orElseThrow();
     }
 }
