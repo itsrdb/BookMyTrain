@@ -10,6 +10,7 @@ import com.itsrdb.bookmytrain.BookMyTrain.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -59,6 +60,7 @@ public class BookingServiceController {
     }
 
     @PostMapping("/addTrain")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Train> addTrain(@RequestBody TrainAdditionRequest trainAddRequest) {
         try {
             Train newTrain = adminService.addTrain(trainAddRequest);
@@ -80,6 +82,7 @@ public class BookingServiceController {
     }
 
     @PostMapping("/bookSeat")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> bookSeat(@RequestBody BookSeatRequest bookSeatRequest) {
         try {
             bookingService.bookSeat(bookSeatRequest);

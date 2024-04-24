@@ -15,6 +15,7 @@ import com.itsrdb.bookmytrain.BookMyTrain.model.Train;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,8 @@ public class BookingService {
     private final TrainRepository trainRepository;
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
+
+    private final Semaphore semaphore = new Semaphore(1);
 
     public List<TrainResponse> getAvailableTrainsForSourceDestination(
             StationToStationRequest stationToStationRequest) {
@@ -59,22 +62,29 @@ public class BookingService {
     }
 
     public void bookSeat(BookSeatRequest bookSeatRequest) {
-        String source = bookSeatRequest.getSource();
-        String destination = bookSeatRequest.getDestination();
-        LocalDate bookingDate = bookSeatRequest.getDate();
-        Train train = trainRepository.getReferenceById(bookSeatRequest.getTrain_id());
+        try {
+            semaphore.acquire();
+            String source = bookSeatRequest.getSource();
+            String destination = bookSeatRequest.getDestination();
+            LocalDate bookingDate = bookSeatRequest.getDate();
+            Train train = trainRepository.getReferenceById(bookSeatRequest.getTrain_id());
 
-        long currentSeatNumber = train.getNoOfSeats() - getTotalAvailableSeats(train, bookingDate) + 1;
-        Booking currentBooking = Booking.builder()
-                .train(train)
-                .source(source)
-                .destination(destination)
-                .bookingDate(bookingDate)
-                .seatNumber(currentSeatNumber)
-                .user(userRepository.getReferenceById(6L))
-                .build();
+            long currentSeatNumber = train.getNoOfSeats() - getTotalAvailableSeats(train, bookingDate) + 1;
+            Booking currentBooking = Booking.builder()
+                    .train(train)
+                    .source(source)
+                    .destination(destination)
+                    .bookingDate(bookingDate)
+                    .seatNumber(currentSeatNumber)
+                    .user(userRepository.getReferenceById(6L))
+                    .build();
 
-        bookingRepository.save(currentBooking);
+            bookingRepository.save(currentBooking);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            semaphore.release();
+        }
     }
 
     public long getTotalAvailableSeats(Train train, LocalDate bookingDate) {
