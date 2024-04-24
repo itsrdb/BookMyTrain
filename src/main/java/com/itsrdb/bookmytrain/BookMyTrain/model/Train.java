@@ -25,7 +25,7 @@ public class Train {
     private String name;
 
     @ElementCollection
-    @CollectionTable(name = "schedule_map", joinColumns = @JoinColumn(name = "schedule_id"))
+    @CollectionTable(name = "schedule_map", joinColumns = @JoinColumn(name = "train_id"))
     private List<Schedule> schedules;
 
     @Column(nullable = false)

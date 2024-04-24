@@ -3,11 +3,13 @@ package com.itsrdb.bookmytrain.BookMyTrain.service;
 import com.itsrdb.bookmytrain.BookMyTrain.dto.StationToStationRequest;
 import com.itsrdb.bookmytrain.BookMyTrain.dto.TrainResponse;
 import com.itsrdb.bookmytrain.BookMyTrain.model.Schedule;
+import com.itsrdb.bookmytrain.BookMyTrain.repository.BookingRepository;
 import com.itsrdb.bookmytrain.BookMyTrain.repository.TrainRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.itsrdb.bookmytrain.BookMyTrain.model.Train;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,16 +18,19 @@ import java.util.List;
 public class BookingService {
 
     private final TrainRepository trainRepository;
+    private final BookingRepository bookingRepository;
 
     public List<TrainResponse> getAvailableTrainsForSourceDestination(
             StationToStationRequest stationToStationRequest) {
         List<Train> trains = trainRepository.findAll();
         String source = stationToStationRequest.getSource();
         String destination = stationToStationRequest.getDestination();
+        LocalDate bookingDate = stationToStationRequest.getDate();
 
         List<TrainResponse> availableTrains = new ArrayList<>();
         for (Train train: trains) {
             // Need to find available seats per train
+            Long availableSeats = getTotalAvailableSeats(train, bookingDate);
 
             Boolean sourceFound = false;
             for (Schedule schedule: train.getSchedules()) {
@@ -45,6 +50,11 @@ public class BookingService {
         }
 
         return availableTrains;
+    }
+
+    public long getTotalAvailableSeats(Train train, LocalDate bookingDate) {
+        Long seatsTaken = bookingRepository.countBookingsByDateAndTrain(train, bookingDate);
+        return train.getNoOfSeats() - seatsTaken;
     }
 
 }
