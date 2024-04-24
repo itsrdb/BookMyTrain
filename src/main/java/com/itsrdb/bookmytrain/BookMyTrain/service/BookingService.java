@@ -44,6 +44,7 @@ public class BookingService {
                             .name(train.getName())
                             .source(source)
                             .destination(destination)
+                            .availableSeats(availableSeats)
                             .build();
                     availableTrains.add(trainResponse);
                 }

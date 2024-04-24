@@ -14,4 +14,5 @@ public class TrainResponse {
     private String name;
     private String source;
     private String destination;
+    private Long availableSeats;
 }
