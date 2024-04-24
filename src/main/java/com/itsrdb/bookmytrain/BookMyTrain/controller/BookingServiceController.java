@@ -1,8 +1,11 @@
 package com.itsrdb.bookmytrain.BookMyTrain.controller;
 
 import com.itsrdb.bookmytrain.BookMyTrain.dto.LoginResponse;
+import com.itsrdb.bookmytrain.BookMyTrain.dto.TrainAdditionRequest;
 import com.itsrdb.bookmytrain.BookMyTrain.dto.UserRequest;
+import com.itsrdb.bookmytrain.BookMyTrain.model.Train;
 import com.itsrdb.bookmytrain.BookMyTrain.model.User;
+import com.itsrdb.bookmytrain.BookMyTrain.service.AdminService;
 import com.itsrdb.bookmytrain.BookMyTrain.service.JwtService;
 import com.itsrdb.bookmytrain.BookMyTrain.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class BookingServiceController {
 
     private final UserService userService;
+    private final AdminService adminService;
     private final JwtService jwtService;
 
     @PostMapping("/register")
@@ -50,6 +54,16 @@ public class BookingServiceController {
                 .build();
 
         return ResponseEntity.ok(loginResponse);
+    }
+
+    @PostMapping("/addTrain")
+    public ResponseEntity<Train> addTrain(@RequestBody TrainAdditionRequest trainAddRequest) {
+        try {
+            Train newTrain = adminService.addTrain(trainAddRequest);
+            return ResponseEntity.ok(newTrain);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

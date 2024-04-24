@@ -14,6 +14,15 @@ import java.time.LocalTime;
 @Builder
 @Embeddable
 public class Schedule {
+
     private String stationName;
     private LocalTime arrivalTime;
+
+    public Schedule() {
+    }
+
+    public Schedule(String stationName, LocalTime arrivalTime) {
+        this.stationName = stationName;
+        this.arrivalTime = arrivalTime;
+    }
 }

@@ -27,14 +27,11 @@ public class Train {
     private String name;
 
     @ElementCollection
-    @CollectionTable(name = "schedule_map", joinColumns = @JoinColumn(name = "entity_id"))
+    @CollectionTable(name = "schedule_map", joinColumns = @JoinColumn(name = "schedule_id"))
     private List<Schedule> schedules;
 
     @Column(nullable = false)
     private Long noOfSeats;
-
-    @Column(nullable = false, columnDefinition = "bigint default 0")
-    private Long noOfSeatsBooked;
 
     @CreationTimestamp
     @Column(updatable = false, name = "created_at")
@@ -43,9 +40,5 @@ public class Train {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Date updatedAt;
-
-    private Long getNoOfSeatsAvailable() {
-        return noOfSeats - noOfSeatsBooked ;
-    }
 
 }
