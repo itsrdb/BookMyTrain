@@ -19,7 +19,7 @@ public class BookingServiceController {
     private final JwtService jwtService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody UserRequest userRequest) throws Exception {
+    public ResponseEntity<String> registerUser(@RequestBody UserRequest userRequest) {
         try {
             userService.register(userRequest, User.Role.USER);
             return new ResponseEntity<>("User registered successfully", HttpStatus.CREATED);
@@ -29,7 +29,7 @@ public class BookingServiceController {
     }
 
     @PostMapping("/registerAdmin")
-    public ResponseEntity<String> registerAdmin(@RequestBody UserRequest userRequest) throws Exception {
+    public ResponseEntity<String> registerAdmin(@RequestBody UserRequest userRequest) {
         try {
             userService.register(userRequest, User.Role.ADMIN);
             return new ResponseEntity<>("Admin resgistered successfully", HttpStatus.CREATED);
