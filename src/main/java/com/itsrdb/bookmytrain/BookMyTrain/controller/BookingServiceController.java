@@ -1,17 +1,18 @@
 package com.itsrdb.bookmytrain.BookMyTrain.controller;
 
-import com.itsrdb.bookmytrain.BookMyTrain.dto.LoginResponse;
-import com.itsrdb.bookmytrain.BookMyTrain.dto.TrainAdditionRequest;
-import com.itsrdb.bookmytrain.BookMyTrain.dto.UserRequest;
+import com.itsrdb.bookmytrain.BookMyTrain.dto.*;
 import com.itsrdb.bookmytrain.BookMyTrain.model.Train;
 import com.itsrdb.bookmytrain.BookMyTrain.model.User;
 import com.itsrdb.bookmytrain.BookMyTrain.service.AdminService;
+import com.itsrdb.bookmytrain.BookMyTrain.service.BookingService;
 import com.itsrdb.bookmytrain.BookMyTrain.service.JwtService;
 import com.itsrdb.bookmytrain.BookMyTrain.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -20,6 +21,7 @@ public class BookingServiceController {
 
     private final UserService userService;
     private final AdminService adminService;
+    private final BookingService bookingService;
     private final JwtService jwtService;
 
     @PostMapping("/register")
@@ -60,6 +62,17 @@ public class BookingServiceController {
     public ResponseEntity<Train> addTrain(@RequestBody TrainAdditionRequest trainAddRequest) {
         try {
             Train newTrain = adminService.addTrain(trainAddRequest);
+            return ResponseEntity.ok(newTrain);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/getTrains")
+    public ResponseEntity<List<TrainResponse>> getTrains(@RequestBody StationToStationRequest stationToStationRequest) {
+        try {
+            List<TrainResponse> availableTrains = bookingService
+                    .getAvailableTrainsForSourceDestination(stationToStationRequest);
             return ResponseEntity.ok(newTrain);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
