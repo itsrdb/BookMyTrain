@@ -1,10 +1,13 @@
 package com.itsrdb.bookmytrain.BookMyTrain.service;
 
+import com.itsrdb.bookmytrain.BookMyTrain.dto.BookSeatRequest;
 import com.itsrdb.bookmytrain.BookMyTrain.dto.StationToStationRequest;
 import com.itsrdb.bookmytrain.BookMyTrain.dto.TrainResponse;
+import com.itsrdb.bookmytrain.BookMyTrain.model.Booking;
 import com.itsrdb.bookmytrain.BookMyTrain.model.Schedule;
 import com.itsrdb.bookmytrain.BookMyTrain.repository.BookingRepository;
 import com.itsrdb.bookmytrain.BookMyTrain.repository.TrainRepository;
+import com.itsrdb.bookmytrain.BookMyTrain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.itsrdb.bookmytrain.BookMyTrain.model.Train;
@@ -19,6 +22,7 @@ public class BookingService {
 
     private final TrainRepository trainRepository;
     private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
 
     public List<TrainResponse> getAvailableTrainsForSourceDestination(
             StationToStationRequest stationToStationRequest) {
@@ -52,6 +56,25 @@ public class BookingService {
         }
 
         return availableTrains;
+    }
+
+    public void bookSeat(BookSeatRequest bookSeatRequest) {
+        String source = bookSeatRequest.getSource();
+        String destination = bookSeatRequest.getDestination();
+        LocalDate bookingDate = bookSeatRequest.getDate();
+        Train train = trainRepository.getReferenceById(bookSeatRequest.getTrain_id());
+
+        long currentSeatNumber = train.getNoOfSeats() - getTotalAvailableSeats(train, bookingDate) + 1;
+        Booking currentBooking = Booking.builder()
+                .train(train)
+                .source(source)
+                .destination(destination)
+                .bookingDate(bookingDate)
+                .seatNumber(currentSeatNumber)
+                .user(userRepository.getReferenceById(6L))
+                .build();
+
+        bookingRepository.save(currentBooking);
     }
 
     public long getTotalAvailableSeats(Train train, LocalDate bookingDate) {

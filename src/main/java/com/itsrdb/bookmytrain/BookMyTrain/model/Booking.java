@@ -30,6 +30,10 @@ public class Booking {
     @JoinColumn(name = "train_id", referencedColumnName = "id")
     private Train train;
 
+    private String source;
+
+    private String destination;
+
     private Long seatNumber;
 
 }

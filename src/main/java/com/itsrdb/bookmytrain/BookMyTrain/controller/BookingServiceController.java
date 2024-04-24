@@ -79,4 +79,14 @@ public class BookingServiceController {
         }
     }
 
+    @PostMapping("/bookSeat")
+    public ResponseEntity<String> bookSeat(@RequestBody BookSeatRequest bookSeatRequest) {
+        try {
+            bookingService.bookSeat(bookSeatRequest);
+            return new ResponseEntity<>("Booking successful", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Sorry, could not book seat", HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }
