@@ -24,7 +24,7 @@ public class BookingServiceController {
             userService.register(userRequest, User.Role.USER);
             return new ResponseEntity<>("User registered successfully", HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Unable to register user", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -32,14 +32,14 @@ public class BookingServiceController {
     public ResponseEntity<String> registerAdmin(@RequestBody UserRequest userRequest) {
         try {
             userService.register(userRequest, User.Role.ADMIN);
-            return new ResponseEntity<>("Admin resgistered successfully", HttpStatus.CREATED);
+            return new ResponseEntity<>("Admin registered successfully", HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Unable to register admin user", HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> authenticate(@RequestBody UserRequest userRequest) throws Exception {
+    public ResponseEntity<LoginResponse> authenticate(@RequestBody UserRequest userRequest) {
         User authenticatedUser = userService.authenticate(userRequest);
 
         String jwtToken = jwtService.generateToken(authenticatedUser);

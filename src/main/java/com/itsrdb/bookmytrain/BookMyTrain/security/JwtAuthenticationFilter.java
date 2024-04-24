@@ -1,4 +1,4 @@
-package com.itsrdb.bookmytrain.BookMyTrain.config;
+package com.itsrdb.bookmytrain.BookMyTrain.security;
 
 import com.itsrdb.bookmytrain.BookMyTrain.service.JwtService;
 import jakarta.servlet.FilterChain;

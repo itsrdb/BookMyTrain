@@ -1,4 +1,4 @@
-package com.itsrdb.bookmytrain.BookMyTrain.config;
+package com.itsrdb.bookmytrain.BookMyTrain.security;
 
 import com.itsrdb.bookmytrain.BookMyTrain.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
