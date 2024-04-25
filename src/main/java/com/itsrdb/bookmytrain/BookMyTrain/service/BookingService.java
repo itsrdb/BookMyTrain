@@ -1,6 +1,7 @@
 package com.itsrdb.bookmytrain.BookMyTrain.service;
 
 import com.itsrdb.bookmytrain.BookMyTrain.dto.BookSeatRequest;
+import com.itsrdb.bookmytrain.BookMyTrain.dto.BookingResponse;
 import com.itsrdb.bookmytrain.BookMyTrain.dto.StationToStationRequest;
 import com.itsrdb.bookmytrain.BookMyTrain.dto.TrainResponse;
 import com.itsrdb.bookmytrain.BookMyTrain.model.Booking;
@@ -39,7 +40,7 @@ public class BookingService {
         List<TrainResponse> availableTrains = new ArrayList<>();
         for (Train train: trains) {
             long availableSeats = getTotalAvailableSeats(train, bookingDate);
-            if (availableSeats == 0)
+            if (availableSeats <= 0)
                 continue;
 
             boolean sourceFound = false;
@@ -101,4 +102,36 @@ public class BookingService {
         return train.getNoOfSeats() - seatsTaken;
     }
 
+    public List<BookingResponse> getAllBookings(String username) throws Exception {
+        Optional<User> user = userRepository.findByUsername(username);
+
+        if (user.isEmpty()) {
+            throw new Exception("Invalid user details.");
+        }
+
+        Optional<List<Booking>> bookings = bookingRepository.findByUser(user.get());
+
+        if (bookings.isPresent()) {
+            return getBookingResponse(bookings.get());
+        }
+        return new ArrayList<>();
+    }
+
+    public List<BookingResponse> getBookingResponse(List<Booking> bookingsList) {
+        List<BookingResponse> bookingResponseList = new ArrayList<>();
+        for (Booking booking: bookingsList) {
+            BookingResponse bookingResponse = BookingResponse.builder()
+                    .trainName(booking.getTrain().getName())
+                    .trainNumber(booking.getTrain().getId())
+                    .seatNumber(booking.getSeatNumber())
+                    .bookingDate(booking.getBookingDate())
+                    .source(booking.getSource())
+                    .destination(booking.getDestination())
+                    .build();
+
+            bookingResponseList.add(bookingResponse);
+        }
+
+        return bookingResponseList;
+    }
 }

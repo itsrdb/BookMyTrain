@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -96,6 +95,19 @@ public class BookingServiceController {
             return new ResponseEntity<>("Booking successful", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Sorry, could not book seat", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/getAllBookings")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<BookingResponse>> getBookingResponse() {
+        try {
+            Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
+            String username = authToken.getName();
+
+            return ResponseEntity.ok(bookingService.getAllBookings(username));
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
