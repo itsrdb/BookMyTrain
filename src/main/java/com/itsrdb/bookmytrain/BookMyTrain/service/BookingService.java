@@ -39,25 +39,16 @@ public class BookingService {
 
         List<TrainResponse> availableTrains = new ArrayList<>();
         for (Train train: trains) {
-            long availableSeats = getTotalAvailableSeats(train, bookingDate);
-            if (availableSeats <= 0)
-                continue;
 
-            boolean sourceFound = false;
-            for (Schedule schedule: train.getSchedules()) {
-                if (schedule.getStationName().equals(source)) {
-                    sourceFound = true;
-                }
-                if (sourceFound && schedule.getStationName().equals(destination)) {
-                    TrainResponse trainResponse = TrainResponse.builder()
-                            .id(train.getId())
-                            .name(train.getName())
-                            .source(source)
-                            .destination(destination)
-                            .availableSeats(availableSeats)
-                            .build();
-                    availableTrains.add(trainResponse);
-                }
+            if (isTrainEligibleAndAvailable(train, source, destination, bookingDate)) {
+                TrainResponse trainResponse = TrainResponse.builder()
+                        .id(train.getId())
+                        .name(train.getName())
+                        .source(source)
+                        .destination(destination)
+                        .availableSeats(getTotalAvailableSeats(train, bookingDate))
+                        .build();
+                availableTrains.add(trainResponse);
             }
         }
 
@@ -73,7 +64,7 @@ public class BookingService {
             Train train = trainRepository.getReferenceById(bookSeatRequest.getTrain_id());
             Optional<User> user = userRepository.findByUsername(username);
 
-            if (user.isEmpty()) {
+            if (user.isEmpty() || !isTrainEligibleAndAvailable(train, source, destination, bookingDate)) {
                 throw new Exception("Invalid user details.");
             }
 
@@ -95,6 +86,24 @@ public class BookingService {
         } finally {
             semaphore.release();
         }
+    }
+
+    public boolean isTrainEligibleAndAvailable(Train train, String source, String destination, LocalDate bookingDate) {
+        long availableSeats = getTotalAvailableSeats(train, bookingDate);
+        if (availableSeats <= 0)
+            return false;
+
+        boolean sourceFound = false;
+        for (Schedule schedule: train.getSchedules()) {
+            if (schedule.getStationName().equals(source)) {
+                sourceFound = true;
+            }
+            if (sourceFound && schedule.getStationName().equals(destination)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public long getTotalAvailableSeats(Train train, LocalDate bookingDate) {

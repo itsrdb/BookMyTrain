@@ -98,7 +98,7 @@ public class BookingServiceController {
         }
     }
 
-    @PostMapping("/getAllBookings")
+    @GetMapping("/getAllBookings")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<BookingResponse>> getBookingResponse() {
         try {
