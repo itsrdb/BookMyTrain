@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -106,6 +107,21 @@ public class BookingServiceController {
             String username = authToken.getName();
 
             return ResponseEntity.ok(bookingService.getAllBookings(username));
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/getBookingsOnDate")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<BookingResponse>> getBookingsOnDate(@RequestBody
+                                                                       BookingsOnDateRequest bookingsOnDateRequest) {
+        try {
+            Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
+            String username = authToken.getName();
+            LocalDate bookingDate = bookingsOnDateRequest.getDate();
+
+            return ResponseEntity.ok(bookingService.getBookingsOnDate(username, bookingDate));
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

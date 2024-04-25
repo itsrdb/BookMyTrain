@@ -113,13 +113,24 @@ public class BookingService {
 
     public List<BookingResponse> getAllBookings(String username) throws Exception {
         Optional<User> user = userRepository.findByUsername(username);
-
         if (user.isEmpty()) {
             throw new Exception("Invalid user details.");
         }
 
         Optional<List<Booking>> bookings = bookingRepository.findByUser(user.get());
+        if (bookings.isPresent()) {
+            return getBookingResponse(bookings.get());
+        }
+        return new ArrayList<>();
+    }
 
+    public List<BookingResponse> getBookingsOnDate(String username, LocalDate bookingDate) throws Exception {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isEmpty()) {
+            throw new Exception("Invalid user details.");
+        }
+
+        Optional<List<Booking>> bookings = bookingRepository.findByUserAndDate(user.get(), bookingDate);
         if (bookings.isPresent()) {
             return getBookingResponse(bookings.get());
         }

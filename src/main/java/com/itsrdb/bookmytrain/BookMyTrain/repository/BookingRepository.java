@@ -18,4 +18,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     long countBookingsByDateAndTrain(@Param("train") Train train, @Param("date") LocalDate date);
 
     Optional<List<Booking>> findByUser(User user);
+
+    @Query("SELECT b FROM Booking b WHERE b.user = ?1 AND b.bookingDate = ?2")
+    Optional<List<Booking>> findByUserAndDate(User user, LocalDate bookingDate);
 }
