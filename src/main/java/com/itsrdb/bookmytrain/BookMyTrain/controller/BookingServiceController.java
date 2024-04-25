@@ -1,6 +1,7 @@
 package com.itsrdb.bookmytrain.BookMyTrain.controller;
 
 import com.itsrdb.bookmytrain.BookMyTrain.dto.*;
+import com.itsrdb.bookmytrain.BookMyTrain.entites.RoleEnum;
 import com.itsrdb.bookmytrain.BookMyTrain.model.Train;
 import com.itsrdb.bookmytrain.BookMyTrain.model.User;
 import com.itsrdb.bookmytrain.BookMyTrain.service.AdminService;
@@ -11,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +32,7 @@ public class BookingServiceController {
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UserRequest userRequest) {
         try {
-            userService.register(userRequest, User.Role.USER);
+            userService.register(userRequest, RoleEnum.USER);
             return new ResponseEntity<>("User registered successfully", HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>("Unable to register user", HttpStatus.BAD_REQUEST);
@@ -38,7 +42,7 @@ public class BookingServiceController {
     @PostMapping("/registerAdmin")
     public ResponseEntity<String> registerAdmin(@RequestBody UserRequest userRequest) {
         try {
-            userService.register(userRequest, User.Role.ADMIN);
+            userService.register(userRequest, RoleEnum.ADMIN);
             return new ResponseEntity<>("Admin registered successfully", HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>("Unable to register admin user", HttpStatus.BAD_REQUEST);
@@ -85,7 +89,10 @@ public class BookingServiceController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> bookSeat(@RequestBody BookSeatRequest bookSeatRequest) {
         try {
-            bookingService.bookSeat(bookSeatRequest);
+            Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
+            String username = authToken.getName();
+
+            bookingService.bookSeat(bookSeatRequest, username);
             return new ResponseEntity<>("Booking successful", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Sorry, could not book seat", HttpStatus.BAD_REQUEST);

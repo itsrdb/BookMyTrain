@@ -1,7 +1,10 @@
 package com.itsrdb.bookmytrain.BookMyTrain.service;
 
 import com.itsrdb.bookmytrain.BookMyTrain.dto.UserRequest;
+import com.itsrdb.bookmytrain.BookMyTrain.entites.Role;
+import com.itsrdb.bookmytrain.BookMyTrain.entites.RoleEnum;
 import com.itsrdb.bookmytrain.BookMyTrain.model.User;
+import com.itsrdb.bookmytrain.BookMyTrain.repository.RoleRepository;
 import com.itsrdb.bookmytrain.BookMyTrain.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,12 +20,15 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final RoleRepository roleRepository;
 
-    public void register(UserRequest userRequest, User.Role role) {
+    public void register(UserRequest userRequest, RoleEnum role) {
+        Role userRole = roleRepository.findByName(role).get();
+
         User user = User.builder()
                 .username(userRequest.getUsername())
                 .password(userRequest.getPassword())
-                .role(role)
+                .role(userRole)
                 .build();
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));

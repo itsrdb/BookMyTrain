@@ -5,6 +5,7 @@ import com.itsrdb.bookmytrain.BookMyTrain.dto.StationToStationRequest;
 import com.itsrdb.bookmytrain.BookMyTrain.dto.TrainResponse;
 import com.itsrdb.bookmytrain.BookMyTrain.model.Booking;
 import com.itsrdb.bookmytrain.BookMyTrain.model.Schedule;
+import com.itsrdb.bookmytrain.BookMyTrain.model.User;
 import com.itsrdb.bookmytrain.BookMyTrain.repository.BookingRepository;
 import com.itsrdb.bookmytrain.BookMyTrain.repository.TrainRepository;
 import com.itsrdb.bookmytrain.BookMyTrain.repository.UserRepository;
@@ -15,6 +16,7 @@ import com.itsrdb.bookmytrain.BookMyTrain.model.Train;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Semaphore;
 
 @Service
@@ -61,13 +63,18 @@ public class BookingService {
         return availableTrains;
     }
 
-    public void bookSeat(BookSeatRequest bookSeatRequest) {
+    public void bookSeat(BookSeatRequest bookSeatRequest, String username) {
         try {
             semaphore.acquire();
             String source = bookSeatRequest.getSource();
             String destination = bookSeatRequest.getDestination();
             LocalDate bookingDate = bookSeatRequest.getDate();
             Train train = trainRepository.getReferenceById(bookSeatRequest.getTrain_id());
+            Optional<User> user = userRepository.findByUsername(username);
+
+            if (user.isEmpty()) {
+                throw new Exception("Invalid user details.");
+            }
 
             long currentSeatNumber = train.getNoOfSeats() - getTotalAvailableSeats(train, bookingDate) + 1;
             Booking currentBooking = Booking.builder()
@@ -76,12 +83,14 @@ public class BookingService {
                     .destination(destination)
                     .bookingDate(bookingDate)
                     .seatNumber(currentSeatNumber)
-                    .user(userRepository.getReferenceById(6L))
+                    .user(user.get())
                     .build();
 
             bookingRepository.save(currentBooking);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             semaphore.release();
         }
