@@ -2,21 +2,6 @@
 
 BookMyTrain provies a train booking API service. Written in Java Spring Boot leveraging Spring Security. 
 
-## Table of Contents
-
-* [Overview](#overview)
-* [Getting Started](#getting-started)
-    * [Prerequisites](#prerequisites)
-    * [Installation](#installation) (if applicable)
-    * [Authentication](#authentication)
-* [API Reference](#api-reference)
-    * [Resources](#resources)
-        * [List of resources](#list-of-conductors) (examples with links)
-    * [Request Structure](#request-structure) (common request format)
-    * [Response Structure](#response-structure) (common response format)
-    * [Error Codes](#error-codes) (list of error codes and descriptions)
-* [Examples](#examples) (code snippets for common use cases)
-
 ## Overview
 
 * This API uses protected endpoints which can only be accessed by the Admin or authenticated Users.
@@ -203,3 +188,6 @@ http://localhost:3000/api/getBookingsOnDate [GET](Restricted to authorized users
 
 #### * JWT Expiration
 <img width="1413" alt="Screenshot 2024-04-25 at 6 35 53 AM" src="https://github.com/itsrdb/BookMyTrain/assets/15973523/690256ae-977c-4fa4-b9ab-3a688d938b6e">
+
+#### * JWT Generation
+<img width="1414" alt="Screenshot 2024-04-25 at 9 00 53 AM" src="https://github.com/itsrdb/BookMyTrain/assets/15973523/a5552273-385e-45a9-b80d-3596bd1ffd5a">
